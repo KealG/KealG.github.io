@@ -1,0 +1,474 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>操作系统导论 | GamerBlog</title><meta name="keywords" content="操作系统 OS"><meta name="author" content="Keal,894712026@qq.com"><meta name="copyright" content="Keal"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="操作系统导论第二章：操作系统介绍虚拟化并发持久化基本目标：建立一些抽象概念设计和实现操作系统的目标 提供高性能与最小化操作系统的开销 在应用程序之间以及在OS和应用程序之间提供保护 操作系统力求提供高度的可靠性与稳定性  第三章：虚拟化CPU虚拟化 抽象概念：进程  时分共享资源技术  通过让一个进程只运行一个时间片，然后切换到其他进程，OS提供存在多个虚拟CPU的假象 所谓的资源：例如CPU或网">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统导论">
+<meta property="og:url" content="http://gamerblog.cn/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/index.html">
+<meta property="og:site_name" content="GamerBlog">
+<meta property="og:description" content="操作系统导论第二章：操作系统介绍虚拟化并发持久化基本目标：建立一些抽象概念设计和实现操作系统的目标 提供高性能与最小化操作系统的开销 在应用程序之间以及在OS和应用程序之间提供保护 操作系统力求提供高度的可靠性与稳定性  第三章：虚拟化CPU虚拟化 抽象概念：进程  时分共享资源技术  通过让一个进程只运行一个时间片，然后切换到其他进程，OS提供存在多个虚拟CPU的假象 所谓的资源：例如CPU或网">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://gamerblog.cn/img/post/s32332106.jpg">
+<meta property="article:published_time" content="2021-02-17T06:51:11.000Z">
+<meta property="article:modified_time" content="2021-02-17T12:35:07.772Z">
+<meta property="article:author" content="Keal">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gamerblog.cn/img/post/s32332106.jpg"><link rel="shortcut icon" href="/img/siteIcon-game.png"><link rel="canonical" href="http://gamerblog.cn/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Keal","link":"链接: ","source":"来源: GamerBlog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"top-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: true,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-02-17 20:35:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const fontSizeVal = saveToLocal.get('global-font-size')
+    if (fontSizeVal !== undefined) {
+      document.documentElement.style.setProperty('--global-font-size', fontSizeVal + 'px')
+    }
+    })(window)</script><link rel="stylesheet" href="//at.alicdn.com/t/font_2374278_wgajatg377.css"><meta name="generator" content="Hexo 5.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" data-lazy-src="/img/avatar.JPG" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: /img/post/s32332106.jpg"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">GamerBlog</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">操作系统导论</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-02-17T06:51:11.000Z" title="发表于 2021-02-17 14:51:11">2021-02-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-02-17T12:35:07.772Z" title="更新于 2021-02-17 20:35:07">2021-02-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CS%E5%9F%BA%E7%A1%80/">CS基础</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CS%E5%9F%BA%E7%A1%80/OS/">OS</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="操作系统导论"><a href="#操作系统导论" class="headerlink" title="操作系统导论"></a>操作系统导论</h1><h2 id="第二章：操作系统介绍"><a href="#第二章：操作系统介绍" class="headerlink" title="第二章：操作系统介绍"></a>第二章：操作系统介绍</h2><h3 id="虚拟化"><a href="#虚拟化" class="headerlink" title="虚拟化"></a>虚拟化</h3><h3 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h3><h3 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h3><h3 id="基本目标：建立一些抽象概念"><a href="#基本目标：建立一些抽象概念" class="headerlink" title="基本目标：建立一些抽象概念"></a>基本目标：建立一些抽象概念</h3><h3 id="设计和实现操作系统的目标"><a href="#设计和实现操作系统的目标" class="headerlink" title="设计和实现操作系统的目标"></a>设计和实现操作系统的目标</h3><ul>
+<li>提供高性能与最小化操作系统的开销</li>
+<li>在应用程序之间以及在OS和应用程序之间提供保护</li>
+<li>操作系统力求提供高度的可靠性与稳定性</li>
+</ul>
+<h2 id="第三章：虚拟化"><a href="#第三章：虚拟化" class="headerlink" title="第三章：虚拟化"></a>第三章：虚拟化</h2><h3 id="CPU虚拟化"><a href="#CPU虚拟化" class="headerlink" title="CPU虚拟化"></a>CPU虚拟化</h3><ul>
+<li><p>抽象概念：进程</p>
+<ul>
+<li><p>时分共享资源技术</p>
+<ul>
+<li>通过让一个进程只运行一个时间片，然后切换到其他进程，OS提供存在多个虚拟CPU的假象</li>
+<li>所谓的资源：例如CPU或网络链接可以被许多人共享</li>
+</ul>
+</li>
+<li><p>空分共享资源技术</p>
+<ul>
+<li>磁盘空间是一个空分共享资源，因为一旦将块分配给文件，在用户删除文件之前，不可能将它分配给其他文件</li>
+</ul>
+</li>
+<li><p>需要一些低级机制和一些高级智能</p>
+</li>
+<li><p>进程的抽象定义及其组成</p>
+<ul>
+<li><p>一个进程只是一个正在运行的程序</p>
+</li>
+<li><p>组成</p>
+<ul>
+<li><p>寄存器</p>
+<ul>
+<li><p>程序计数器(PC)</p>
+<ul>
+<li>告诉我们程序即将执行哪个指令</li>
+</ul>
+</li>
+<li><p>栈指针和相关的帧指针</p>
+<ul>
+<li>管理函数参数栈、局部变量、返回地址</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>内存</p>
+<ul>
+<li>进程可以访问的内存（地址空间）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>进程基本API</p>
+<ul>
+<li><p>创建</p>
+<ul>
+<li>操作系统提供创建新进程的方法</li>
+</ul>
+</li>
+<li><p>销毁</p>
+<ul>
+<li>强制销毁程序的接口</li>
+</ul>
+</li>
+<li><p>等待</p>
+<ul>
+<li>等待进程停止运行</li>
+</ul>
+</li>
+<li><p>其他控制</p>
+<ul>
+<li>暂停进程</li>
+<li>恢复进程</li>
+</ul>
+</li>
+<li><p>状态</p>
+<ul>
+<li>获取进程当前有关的状态信息</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>进程创建的进一步细节</p>
+<ul>
+<li>1.将代码和所有静态数据例如初始化变量加载到内存中，加载到进程的地址空间中。</li>
+<li>2.在早期的操作系统中，加载过程尽早完成，即在运行之前全部完成。现代操作系统惰性（lazy）执行该过程，即在运行期间需要加载的代码或数据片段才会加载</li>
+<li>3.为程序的运行时栈分配一些内存。（栈空间）存放局部变量、函数参数和返回地址</li>
+<li>4.为程序的堆分配一些内存，数据结构需要堆</li>
+<li>5.一些其他的初始化任务，比如I/O相关任务</li>
+<li>6.OS启动该程序，并在入口处执行(Main()),这时候OS将CPU控制权转移到新创建的该进程中，从而程序开始执行</li>
+</ul>
+</li>
+<li><p>进程的状态</p>
+<ul>
+<li><p>运行</p>
+<ul>
+<li>正在运行中</li>
+</ul>
+</li>
+<li><p>就绪</p>
+<ul>
+<li>准备好运行，由于策略暂时不运行</li>
+</ul>
+</li>
+<li><p>阻塞</p>
+<ul>
+<li>发起IO请求，被阻塞，因此此时其他进程可以使用CPU，例如发起对磁盘数据的加载，对网络包数据的加载等</li>
+</ul>
+</li>
+<li><p>初始</p>
+<ul>
+<li>进程在创建时处于的状态</li>
+</ul>
+</li>
+<li><p>最终</p>
+<ul>
+<li>已经退出但尚未清理的状态，通过返回码告诉父进程它可以清理这个正在结束的进程的所有相关的数据结构</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>上下文切换</p>
+<ul>
+<li>在进程的切换过程中，当前被阻塞的进程其寄存器上下文将保存其寄存器的内容到一个内存位置上，当恢复运行时再通过恢复这些寄存器的信息（将他们的值放回实际的物理寄存器中），操作系统可以恢复运行该进程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>机制：受限制直接执行（底层机制）</p>
+<ul>
+<li><p>需要解决的问题</p>
+<ul>
+<li>1.操作系统如何确保程序不做任何我们不希望它做的事情，同时仍然高效运行它</li>
+<li>2.当我们运行一个进程时，操作系统如何让它停下来并切换到另外一个进程，从而实现虚拟化CPU所需的时分共享</li>
+</ul>
+</li>
+<li><p>问题1：</p>
+<ul>
+<li>用户希望执行某种受限制的特权操作，怎么做？</li>
+<li>硬件通过不同的执行模式来协助操作系统，用户模式与内核模式，并通过OS暴露给用户模式的接口来切换进入内核模式执行相应特权操作</li>
+</ul>
+</li>
+<li><p>问题2：</p>
+<ul>
+<li>陷入内核模式时执行的trap指令，他如何知道OS运行哪些代码？（有无恶意等情况）</li>
+<li>内核通过在启动时设置traptable来实现，当机器启动时它在内核模式下执行，因此可以根据需要自由配置机器硬件。</li>
+</ul>
+</li>
+<li><p>问题3：</p>
+<ul>
+<li>如何在没有协作的情况下获得控制权？</li>
+<li>利用时钟中断，OS重新获得控制权，此时可以根据策略进行进程的切换等</li>
+</ul>
+</li>
+<li><p>问题4：</p>
+<ul>
+<li>如何保存和恢复上下文？</li>
+<li>如果决定切换，OS就会执行一些底层代码，即所谓的上下文切换（为当前正在执行的程序将其寄存器的值保存到内核栈，为下一个却换的进程从其内核栈恢复值到寄存器）</li>
+<li>内核在进入切换代码调用时是一个进程（被中断的那个进程的上下文），在返回时是另一个进程的上下文，当操作系统最终执行从陷阱返回指令时，即将执行的进程变成了当前运行的进程，至此上下文切换完成</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>进程调度（高级智能）</p>
+<ul>
+<li><p>关键：确定工作负载是构建调度策略的关键部分</p>
+</li>
+<li><p>调度指标的定义</p>
+<ul>
+<li>周转时间=完成时间-到达时间</li>
+</ul>
+</li>
+<li><p>常见调度策略（周转时间考虑）</p>
+<ul>
+<li><p>先进先出（FIFO）</p>
+<ul>
+<li>先到先服务</li>
+<li>会存在护航效应</li>
+</ul>
+</li>
+<li><p>最短任务优先（SJF）</p>
+<ul>
+<li>耗时最短的任务最优先执行</li>
+<li>当任务同时到达时，它是一个最优调度算法，但当任务是随时到达时，情况发生了变化，仔细思考这里的变化</li>
+<li>上述问题是因为这里还是基于非抢占式的调度策略</li>
+</ul>
+</li>
+<li><p>最短完成时间优先（STCF）</p>
+<ul>
+<li>向SJF添加抢占策略，即最短完成时间优先或抢占式最短完成时间优先</li>
+<li>基于上一章节的时钟断点切换进程恢复与保存寄存器数据来执行</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>新的调度指标</p>
+<ul>
+<li>响应时间=首次运行-到达时间</li>
+</ul>
+</li>
+<li><p>常见调度策略（响应时间考虑）</p>
+<ul>
+<li><p>轮转（RR）</p>
+<ul>
+<li>在一个时间片（或一个调度量子）内运行一个工作，然后切换到运行队列中的下一个任务，而不是运行一个任务直到结束。反复此轮转过程，直到任务结束</li>
+<li>时间片长度必须是时钟中断周期的倍数</li>
+<li>这里需要考虑，太短的时间片长度带来了很迅速的响应速度，但是响应的提高了整体上下文切换所带来的消耗，因此在设计这里时需要摊销此消耗</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>以上策略结合I/O来思考</p>
+<ul>
+<li>当然基本所有程序都执行I/O否则没有任何输入的程序每次都会产生相同的输出，一个没有输出的程序其运行没有意义</li>
+<li>调度程序显然要在工作发起I/O请求时做出决策，应该在发生I/O进程阻塞时调度安排另外的工作</li>
+<li>同时还必须在I/O完成时做出决定。发生这种情况时会产生中断，操作系统运行并将发出I/O的进程从阻塞状态移回就绪状态。</li>
+</ul>
+</li>
+<li><p>！调度：多级反馈队列（MLFQ）</p>
+<ul>
+<li><p>该策略需要解决两方面的问题</p>
+<ul>
+<li>1.优化周转时间</li>
+<li>2.降低响应时间</li>
+</ul>
+</li>
+<li><p>没有工作长度的先验知识，如何设计一个能同时减少周转时间和响应时间的调度策略？</p>
+</li>
+<li><p>基本规则</p>
+<ul>
+<li>1.有许多队列，每个队列有不同的优先级</li>
+<li>2.任何时候，一个工作只能存在于一个队列中，该策略总是执行较高优先级的工作</li>
+<li>3.每个队列中可能会有多个工作，因此具有同样的优先级，这时，我们对这些工作采取轮转调度策略。</li>
+<li>4.关键就在于如何设置优先级</li>
+</ul>
+</li>
+<li><p>MLFQ没有为每个工作制定不变的优先顺序，而是根据观察到的行为调整它的优先级。</p>
+</li>
+<li><p>运行规则</p>
+<ul>
+<li>1.如果A的优先级&gt;B的优先级，运行A</li>
+<li>2.如果A、B同级，轮转运行A和B</li>
+<li>3.工作进入系统时，放在最高优先级上</li>
+<li>4。工作用完整个时间片后，降低其优先级。如果工作在其时间片内主动释放CPU，则优先级不变。</li>
+<li>5.经过一段时间S，就将系统中所有工作重新加入最高优先级队列。（S要合理的设置，否则会产生饥饿或交互工作得不到合适的CPU时间比例）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="内存虚拟化"><a href="#内存虚拟化" class="headerlink" title="内存虚拟化"></a>内存虚拟化</h3><ul>
+<li><p>抽象：地址空间</p>
+<ul>
+<li><p>因为保护、隔离等问题出现，操作系统需要提供一个易用的物理内存抽象，这个抽象叫地址空间</p>
+</li>
+<li><p>虚拟内存系统的目标</p>
+<ul>
+<li><p>1.透明</p>
+<ul>
+<li>程序不应该感知到内存被虚拟化的事实，程序的行为就好像它拥有自己的私有物理内存</li>
+</ul>
+</li>
+<li><p>2.效率</p>
+<ul>
+<li>OS追求虚拟化尽可能高效，时间与空间皆高效，在实现这一步时，OS依赖于硬件的TLB功能</li>
+</ul>
+</li>
+<li><p>3.保护</p>
+<ul>
+<li>OS确保进程收到保护，不受其他进程影响，OS本身也不会受进程影响，保护能够让我们在进程之间提供隔离的特性</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>常见问题</p>
+<ul>
+<li>忘记分配内存</li>
+<li>没有分配足够多的内存</li>
+<li>忘记初始化分配的内存</li>
+<li>忘记释放内存</li>
+<li>在用完之前释放内存</li>
+<li>反复释放内存</li>
+<li>错误的调用free</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>机制：地址转换</p>
+<ul>
+<li><p>利用基于硬件的地址转换，硬件对每次内存访问进行处理，将指令中的虚拟地址转换为数据实际存储的物理地址，因此在每次内存引用时，硬件都会及进行地址转换。</p>
+</li>
+<li><p>仅仅依靠硬件不足以实现虚拟内存，好需要OS在关键位置介入，设置好硬件，以便完成正确的转换，因此它必须管理内存</p>
+<hr>
+<h1 id="待更新中…"><a href="#待更新中…" class="headerlink" title="待更新中…"></a>待更新中…</h1></li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:894712026@qq.com">Keal</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://gamerblog.cn/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/">http://gamerblog.cn/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://gamerblog.cn" target="_blank">GamerBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></div><div class="post_share"><div class="social-share" data-image="/img/post/s32332106.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2021/02/17/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/"><img class="prev-cover" data-lazy-src="/img/post/ShaderRumen.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Shader入门精要</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="/img/avatar.JPG" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Keal</div><div class="author-info__description">啊被你发现了！这里是总结、温习与分享的小窝！</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/KealG"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://www.zhihu.com/people/dcoding-42" target="_blank" title="知乎"><i class="iconfont icon-zhihu"></i></a><a class="social-icon" href="https://leetcode-cn.com/u/qimingd/" target="_blank" title="Leetcode"><i class="iconfont icon-leetcode"></i></a><a class="social-icon" href="mailto:goo.kgdong@gmail.com" target="_blank" title="Email"><i class="iconfont icon-youjian"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA"><span class="toc-text">操作系统导论</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D"><span class="toc-text">第二章：操作系统介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-text">虚拟化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91"><span class="toc-text">并发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E7%9B%AE%E6%A0%87%EF%BC%9A%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%BA%9B%E6%8A%BD%E8%B1%A1%E6%A6%82%E5%BF%B5"><span class="toc-text">基本目标：建立一些抽象概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="toc-text">设计和实现操作系统的目标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9A%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-text">第三章：虚拟化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-text">CPU虚拟化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-text">内存虚拟化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%85%E6%9B%B4%E6%96%B0%E4%B8%AD%E2%80%A6"><span class="toc-text">待更新中…</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/" title="优化UnityUI指南——官方文档翻译与总结"><img data-lazy-src="/img/post/UnityLogo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="优化UnityUI指南——官方文档翻译与总结"/></a><div class="content"><a class="title" href="/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/" title="优化UnityUI指南——官方文档翻译与总结">优化UnityUI指南——官方文档翻译与总结</a><time datetime="2021-02-17T12:02:23.000Z" title="发表于 2021-02-17 20:02:23">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A/" title="计算机程序的构造和解释"><img data-lazy-src="/img/post/s1113106.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="计算机程序的构造和解释"/></a><div class="content"><a class="title" href="/2021/02/17/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A/" title="计算机程序的构造和解释">计算机程序的构造和解释</a><time datetime="2021-02-17T11:00:34.000Z" title="发表于 2021-02-17 19:00:34">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E5%B7%A5%E7%A8%8B%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97/" title="工程快速上手指南"><img data-lazy-src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="工程快速上手指南"/></a><div class="content"><a class="title" href="/2021/02/17/%E5%B7%A5%E7%A8%8B%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97/" title="工程快速上手指南">工程快速上手指南</a><time datetime="2021-02-17T11:00:18.000Z" title="发表于 2021-02-17 19:00:18">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/" title="Shader入门精要"><img data-lazy-src="/img/post/ShaderRumen.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Shader入门精要"/></a><div class="content"><a class="title" href="/2021/02/17/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/" title="Shader入门精要">Shader入门精要</a><time datetime="2021-02-17T11:00:04.000Z" title="发表于 2021-02-17 19:00:04">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/" title="操作系统导论"><img data-lazy-src="/img/post/s32332106.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="操作系统导论"/></a><div class="content"><a class="title" href="/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/" title="操作系统导论">操作系统导论</a><time datetime="2021-02-17T06:51:11.000Z" title="发表于 2021-02-17 14:51:11">2021-02-17</time></div></div></div></div></div></div></main><footer id="footer" style="background: /img/post/s32332106.jpg"><div id="footer-wrap"><div class="copyright">&copy;2021 By Keal</div><div class="footer_custom_text">要比昨天的自己更厉害才是啊！</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font-plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font-minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

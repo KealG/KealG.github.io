@@ -1,0 +1,711 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>优化UnityUI指南——官方文档翻译与总结 | GamerBlog</title><meta name="keywords" content="UGUI UI 性能优化"><meta name="author" content="Keal,894712026@qq.com"><meta name="copyright" content="Keal"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="优化UnityUI指南常见问题CPU片段着色器利用率过高 填充率过度被使用  花费大量CPU时间重建Canvas批处理画布批处理的重建数量过多 over-dirtying  花费过多的CPU时间来生成顶点 常见于文本问题  UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束UI基础术语及相关概念canvas 原生Unity组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="优化UnityUI指南——官方文档翻译与总结">
+<meta property="og:url" content="http://gamerblog.cn/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="GamerBlog">
+<meta property="og:description" content="优化UnityUI指南常见问题CPU片段着色器利用率过高 填充率过度被使用  花费大量CPU时间重建Canvas批处理画布批处理的重建数量过多 over-dirtying  花费过多的CPU时间来生成顶点 常见于文本问题  UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束UI基础术语及相关概念canvas 原生Unity组件">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://gamerblog.cn/img/post/UnityLogo.jpg">
+<meta property="article:published_time" content="2021-02-17T12:02:23.000Z">
+<meta property="article:modified_time" content="2021-02-17T12:36:56.829Z">
+<meta property="article:author" content="Keal">
+<meta property="article:tag" content="UGUI">
+<meta property="article:tag" content="UI">
+<meta property="article:tag" content="UNITY">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gamerblog.cn/img/post/UnityLogo.jpg"><link rel="shortcut icon" href="/img/siteIcon-game.png"><link rel="canonical" href="http://gamerblog.cn/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Keal","link":"链接: ","source":"来源: GamerBlog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"top-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: true,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-02-17 20:36:56'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const fontSizeVal = saveToLocal.get('global-font-size')
+    if (fontSizeVal !== undefined) {
+      document.documentElement.style.setProperty('--global-font-size', fontSizeVal + 'px')
+    }
+    })(window)</script><link rel="stylesheet" href="//at.alicdn.com/t/font_2374278_wgajatg377.css"><meta name="generator" content="Hexo 5.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" data-lazy-src="/img/avatar.JPG" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: /img/post/UnityLogo.jpg"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">GamerBlog</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">优化UnityUI指南——官方文档翻译与总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-02-17T12:02:23.000Z" title="发表于 2021-02-17 20:02:23">2021-02-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-02-17T12:36:56.829Z" title="更新于 2021-02-17 20:36:56">2021-02-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Game-Engine/">Game Engine</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Game-Engine/Unity/">Unity</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Game-Engine/Unity/UI-UGUI/">UI(UGUI)</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="优化UnityUI指南"><a href="#优化UnityUI指南" class="headerlink" title="优化UnityUI指南"></a>优化UnityUI指南</h1><h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h3 id="CPU片段着色器利用率过高"><a href="#CPU片段着色器利用率过高" class="headerlink" title="CPU片段着色器利用率过高"></a>CPU片段着色器利用率过高</h3><ul>
+<li>填充率过度被使用</li>
+</ul>
+<h3 id="花费大量CPU时间重建Canvas批处理"><a href="#花费大量CPU时间重建Canvas批处理" class="headerlink" title="花费大量CPU时间重建Canvas批处理"></a>花费大量CPU时间重建Canvas批处理</h3><h3 id="画布批处理的重建数量过多"><a href="#画布批处理的重建数量过多" class="headerlink" title="画布批处理的重建数量过多"></a>画布批处理的重建数量过多</h3><ul>
+<li>over-dirtying</li>
+</ul>
+<h3 id="花费过多的CPU时间来生成顶点"><a href="#花费过多的CPU时间来生成顶点" class="headerlink" title="花费过多的CPU时间来生成顶点"></a>花费过多的CPU时间来生成顶点</h3><ul>
+<li>常见于文本问题</li>
+</ul>
+<h3 id="UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束"><a href="#UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束" class="headerlink" title="UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束"></a>UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束</h3><h2 id="UI基础术语及相关概念"><a href="#UI基础术语及相关概念" class="headerlink" title="UI基础术语及相关概念"></a>UI基础术语及相关概念</h2><h3 id="canvas"><a href="#canvas" class="headerlink" title="canvas"></a>canvas</h3><ul>
+<li>原生Unity组件，负责将构成其的几何图形合批，生成适当的渲染命令并将他们发送到unity图形系统</li>
+<li>上述过程被称为一次rebatch或一次batchbuild</li>
+<li>当Canvas被标记为包含需要重新编排的几何图形时，它被认为是dirty的</li>
+<li>Canvas Renderer组件将几何体提供给canvas</li>
+</ul>
+<h3 id="sub-canvas"><a href="#sub-canvas" class="headerlink" title="sub-canvas"></a>sub-canvas</h3><ul>
+<li><p>Sub-Canvas：一个Canvas组件被嵌套在一个Canvas组件里的组件</p>
+</li>
+<li><p>Sub-Canvas将其子对象与其父对象隔离</p>
+<ul>
+<li>隔离以后，dirty的子对象不会强制父对象重建其几何图形，反过来父对象也不会强制子对象重建其几何图形</li>
+<li>但特殊情况若调整父对象Canvas则会重建子对象Canvas的size</li>
+</ul>
+</li>
+</ul>
+<h3 id="Graphic基类"><a href="#Graphic基类" class="headerlink" title="Graphic基类"></a>Graphic基类</h3><ul>
+<li><p>该类是所有UnityUI的基类</p>
+<ul>
+<li>提供Canvas系统可绘制几何图形的能力</li>
+</ul>
+</li>
+<li><p>大多数内置的UnityUI图形是通过MaskableGraphic子类实现的</p>
+<ul>
+<li>提供IMaskable接口允许被遮盖</li>
+</ul>
+</li>
+</ul>
+<h3 id="Layout组件"><a href="#Layout组件" class="headerlink" title="Layout组件"></a>Layout组件</h3><ul>
+<li><p>该组件控制RectTransforms的大小和位置，一般用于创造控制他们所包含对象的相对大小或相对位置的复杂布局</p>
+</li>
+<li><p>该组件仅依赖于RectTransforms，并且仅影响其关联的RectTransforms的属性</p>
+<ul>
+<li>不依赖于Graphic类，因此可以独立于UnityUI的Graphic组件来使用该组件</li>
+</ul>
+</li>
+</ul>
+<h3 id="CanvasUpdateRegistry类"><a href="#CanvasUpdateRegistry类" class="headerlink" title="CanvasUpdateRegistry类"></a>CanvasUpdateRegistry类</h3><ul>
+<li><p>Graphic和Layout都依赖于此类</p>
+</li>
+<li><p>这个类跟踪必须更新的Layout组件和Graphic组件的集合，并且在他们相惯量的Canvas调用WillRenderCanvases事件时根据需要触发更新</p>
+<ul>
+<li>Layout和Graphic组件的更新被称为rebulid</li>
+</ul>
+</li>
+</ul>
+<h3 id="渲染细节"><a href="#渲染细节" class="headerlink" title="渲染细节"></a>渲染细节</h3><ul>
+<li>由UnityUICanvas绘制的所有集合图形都将在“透明”队列中进行绘制，通过其生成的几何图形始终通过alpha混合来从后到前绘制</li>
+<li>性能：从性能角度要记住的重要一点是，即使从多边形栅格化的每个像素都被其他不透明的多边形完全覆盖，也将对其进行采样。在移动设备上，这种较高的透支水平可能会迅速超过Gpu的填充率容量</li>
+</ul>
+<h3 id="Canvas的Batch过程"><a href="#Canvas的Batch过程" class="headerlink" title="Canvas的Batch过程"></a>Canvas的Batch过程</h3><ul>
+<li><p>批处理构建过程是画布将代表其UI元素的网格进行合并，并生成适当的渲染命令以发送到Unity的图形管道，此过程的结果将被缓存并重复使用，一直到Canvas标记为dirty为止</p>
+</li>
+<li><p>当Canvas的组成网格发生变化时，就会出现这种情况</p>
+</li>
+<li><p>Canvas的组成网格取自附加到画布但不包含在任何子画布中的CanvasRender组件</p>
+</li>
+<li><p>计算批次需要按深度对网格进行分类并检查他们是否覆盖，拥有共享材质等</p>
+<ul>
+<li>该操作是多线程的，因此在不同的CPU结构之间，尤其是在移动SoC之间，其性能差异会很大</li>
+</ul>
+</li>
+</ul>
+<h3 id="Graphics的重建过程"><a href="#Graphics的重建过程" class="headerlink" title="Graphics的重建过程"></a>Graphics的重建过程</h3><ul>
+<li><p>该过程会重新计算UnityUI的C#图形组件的布局和网格</p>
+</li>
+<li><p>这个过程在CanvasUpdateRegistry类中执行，开源</p>
+</li>
+<li><p>在CanvasUpdateRegistry中，重点观察的方法是PerformUpdate。每当Canvas组件调用WillRenderCanvases事件时，都会调用此方法，该事件每帧被调用一次</p>
+</li>
+<li><p>工作流程</p>
+<ul>
+<li><p>1.通过ICanvasElement.Rebuild方法，要求dirtyLayout组件重新生成其布局</p>
+<ul>
+<li><p>该过程又分为三个部分</p>
+<ul>
+<li>预布局</li>
+<li>布局</li>
+<li>后布局</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>2.要求任何已注册的剪切组件（例如Masks）剔除所有剪切的元素，这是通过ClippingRegistry.Cull完成的</p>
+</li>
+<li><p>3.dirtyGraphic组件被调用来重建其图形元素</p>
+<ul>
+<li><p>该过程又分为两个部分</p>
+<ul>
+<li>预渲染</li>
+<li>后预渲染</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Layout重建</p>
+<ul>
+<li>重新计算一个或多个布局组件中包含的组件的适当位置，并且按照其在hierarchical中表现的层级结构顺序应用布局</li>
+<li> 更靠近root根节点的由layout控制的对象更优先改变位置和尺寸，所以应该优先被计算（父变化更少）</li>
+<li>UnityUI将dirty标记的layout组件按其在层次结构中的深度进行排序，层次结构中较高的项目会移到列表的最前面</li>
+<li>该排序列表会被请求以用于重建其布局，这也是实际上更改由布局组件控制的UI元素的位置和大小的地方</li>
+</ul>
+</li>
+<li><p>Graphic重建</p>
+<ul>
+<li><p>当Graphic元素被重建时，UnityUI将控制权传递给ICanvasElement接口的Rebuild方法</p>
+</li>
+<li><p>Graphic通过两个步骤在重建过程的预渲染阶段实现</p>
+<ul>
+<li>如果顶点数据被标记为dirty，则重新构建mesh网格数据(例如当组件的RectTransform大小更改时)</li>
+<li>如果材质数据被标记为dirty(当组件对象的材质或纹理发生变化时)，则将更新附加的CanvasRenderer将被更新</li>
+<li>Graphic重建不会以任何特定顺序遍历图形组件列表，并且不需要任何排序的操作</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="UnityUIProfilingTools"><a href="#UnityUIProfilingTools" class="headerlink" title="UnityUIProfilingTools"></a>UnityUIProfilingTools</h2><h3 id="毫秒-方法级性能分析外部扩展工具"><a href="#毫秒-方法级性能分析外部扩展工具" class="headerlink" title="毫秒-方法级性能分析外部扩展工具"></a>毫秒-方法级性能分析外部扩展工具</h3><h3 id="UnityProfiler"><a href="#UnityProfiler" class="headerlink" title="UnityProfiler"></a>UnityProfiler</h3><ul>
+<li><p>CPU探查器模块</p>
+<ul>
+<li><p>主要用途：执行比较概要分析</p>
+</li>
+<li><p>在运行时启用和禁用UI元素可以迅速缩小UI层次结构中最引起性能问题的部分</p>
+</li>
+<li><p>注意观察Canvas.BuildBatch和Canvas.SendWillRenderCanvases</p>
+<ul>
+<li><p>Canvas.BuildBatch</p>
+<ul>
+<li>Canvas执行批处理构建过程的本机代码计算消耗</li>
+</ul>
+</li>
+<li><p>Canvas.SendWillRenderCanvasess</p>
+<ul>
+<li>Canvas.SendWillRenderCanvasess包含了对Canvas组件的willRenderCanvases事件订阅的C#脚本的调用，UI的CanvasUpdateRegistry类接受到此事件，并使用它来进行重建过程</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>UI探查器模块</p>
+<ul>
+<li><p>第一个时间轴显示在两个类别上所花费的CPU事件</p>
+</li>
+<li><p>第二个时间轴显示批处理，顶点的总数并显示事件标记</p>
+</li>
+<li><p>*批处理查看器</p>
+<ul>
+<li><p>能够查看所有画布的树状视图</p>
+<ul>
+<li>有助于更好的了解如何优化UI及批处理中断原因</li>
+</ul>
+</li>
+<li><p>常见出现中断批次问题原因</p>
+<ul>
+<li>使用了不同纹理或材质的UI元素</li>
+</ul>
+</li>
+<li><p>常见解决方法</p>
+<ul>
+<li>使用图集与（参考网上动态打图集做法）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="UnityFrameDebugger"><a href="#UnityFrameDebugger" class="headerlink" title="UnityFrameDebugger"></a>UnityFrameDebugger</h3><ul>
+<li><p>可以Debug以减少UnityUI生成的绘图调用的次数</p>
+</li>
+<li><p>Tips：基于EditorGameView绘制调用进行更新，所以可以在不进入播放模式下进行调试</p>
+</li>
+<li><p>UnityUI绘制调用的位置取决于在绘制的Canvas组件上选择的渲染模式</p>
+<ul>
+<li><p>屏幕空间-覆盖</p>
+<ul>
+<li>将出现在Canvas.RenderOverlays组中</li>
+</ul>
+</li>
+<li><p>屏幕空间-摄影机</p>
+<ul>
+<li>将出现在选定摄影机的Camera.Render组件中</li>
+</ul>
+</li>
+<li><p>世界空间</p>
+<ul>
+<li>将出现在可见画布的每个世界空间摄像机的Render.TransparentGeometry子组</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>通过这种方式可以实时调试并观察分析结果，最大化Canvas将UI元素组合为批处理的过程</p>
+</li>
+<li><p>常见问题</p>
+<ul>
+<li>意外或非必要的重叠</li>
+</ul>
+</li>
+<li><p>问题产生的根本原因</p>
+<ul>
+<li><p>UnityUI完全在透明队列中运行，必须在不可合批的四边形被覆盖之前绘制出该不可合批的四边形</p>
+<ul>
+<li>举例：考虑三个四边形（A、B和C）他们相互重叠，但是AC拥有相同的材质，B使用单独的材质，所以B和AC不能合批处理</li>
+<li>如果从上到下是A，B,C,则无法批处理A和C，因为B必须在AC的中间绘制（3次），但是若将B放在AC的前面或者后面那么就是(2次)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="一些建议"><a href="#一些建议" class="headerlink" title="一些建议"></a>一些建议</h3><ul>
+<li><p>Canvas.BuildBatch()或Canvas.UpdateBatches()使用了过多的CPU时间</p>
+<ul>
+<li><p>大概率问题可能是单个Canvas上的CanvasRender组件数量过多</p>
+<ul>
+<li>参阅Canvas中分割Canvas部分内容</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>IndexedSet_Sort()与CanvasUpdateRegistry_SortLayoutList()花费过多WillRenderCanvas占比时间</p>
+<ul>
+<li><p>花费过多时间对dirty标记组件列表进行排序</p>
+<ul>
+<li>减少Canvas上layout组件的数量，参考使用RectTransforms替换Layout 和拆分画布部分以获取可能的补救措施</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Text_OnPopulateMesh花费过多时间</p>
+<ul>
+<li><p>BestFit与DisablingCanvasessections</p>
+<ul>
+<li>考虑切分Canvases如果正在重建的文本灭有更改基础字符串部分</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Shadow_ModifyMesh或者Outline_ModifyMesh(ModifyMesh之下其他的实现)花费过多时间</p>
+<ul>
+<li><p>花费太多时间计算修改网格渲染器</p>
+<ul>
+<li>考虑移除这些组件并通过静态图像实现其视觉效果</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如果没有特别的热点或是Canvas.SendWillRenderCanvases每帧都在执行</p>
+<ul>
+<li><p>动静组件未分离</p>
+<ul>
+<li>考虑分割Canvas并进行动静分离</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Instruments和VTune对Apple和IntelCPU上的UnityUI重建和Canvas批处理进行深入分析"><a href="#Instruments和VTune对Apple和IntelCPU上的UnityUI重建和Canvas批处理进行深入分析" class="headerlink" title="Instruments和VTune对Apple和IntelCPU上的UnityUI重建和Canvas批处理进行深入分析"></a>Instruments和VTune对Apple和IntelCPU上的UnityUI重建和Canvas批处理进行深入分析</h3><ul>
+<li>暂略</li>
+</ul>
+<h2 id="更广泛的UnityUI问题Fill-rate-Canvas和input"><a href="#更广泛的UnityUI问题Fill-rate-Canvas和input" class="headerlink" title="更广泛的UnityUI问题Fill-rate,Canvas和input"></a>更广泛的UnityUI问题Fill-rate,Canvas和input</h2><h3 id="修复填充率问题"><a href="#修复填充率问题" class="headerlink" title="修复填充率问题"></a>修复填充率问题</h3><ul>
+<li><p>降低片段着色器的复杂性，详细参考“UI着色器和低规格设备”部分</p>
+</li>
+<li><p>减少必须采样的像素数</p>
+</li>
+<li><p>消除不可见的用户界面</p>
+<ul>
+<li><p>禁用不可见的UI元素</p>
+<ul>
+<li>当打开具有不透明的全屏UI时，在这种情况下，可以禁用放置于全屏UI下方的任何UI元素。</li>
+<li>最简单的操作即禁用包含不可见UI元素的根GameObject</li>
+<li>通过将Alpha设置为0，确保没有UI元素被隐藏，因为被隐藏的该元素仍然将发送到GPU</li>
+<li>如果UI元素不需要图形组件，则只需要将其删除，光纤投射仍然将起作用</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>简化UI结构</p>
+<ul>
+<li><p>减少重建和呈现UI所需的时间</p>
+<ul>
+<li>使UI对象的数量尽可能地少，尝试尽可能多的烘培物体</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>禁用隐形摄像机输出</p>
+<ul>
+<li><p>禁用不可见的场景对象</p>
+<ul>
+<li>当打开了具有不透明背景的全屏UI，则世界空间渲染场景的相机不知道这一情况，仍然在工作，而这无异于浪费宝贵的GPU资源</li>
+<li>根据需求可将最后一帧画面给RawImage表现来优化性能</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>合成UI</p>
+<ul>
+<li><p>创建专门的UISprite，这些Sprite合成了尽可能多的不可变元素到其背景纹理中</p>
+<ul>
+<li>尽可能节省填充消耗</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>优化UI着色器</p>
+<ul>
+<li>针对低端设备按需求优化或自定义UI着色器，比如若低端设备上不需要遮罩剪辑和其他“复杂”功能，可以创建一个自定义着色器以忽略那些在项目中从未使用到的操作</li>
+</ul>
+</li>
+</ul>
+<h3 id="UICanvas重建（Rebuild）"><a href="#UICanvas重建（Rebuild）" class="headerlink" title="UICanvas重建（Rebuild）"></a>UICanvas重建（Rebuild）</h3><ul>
+<li><p>运行动态布局代码</p>
+</li>
+<li><p>生成多边形以表示UI文本</p>
+</li>
+<li><p>将尽可能多的几何图形合批到单个网格中，以最大程度减少绘制调用</p>
+</li>
+<li><p>常见性能问题</p>
+<ul>
+<li>如果单个Canvas上待绘制UI元素数量很大，计算批处理这个过程就会消耗很大，因为对这些元素排序和分析的成本增长速度超出了线性范围</li>
+<li>如果单个Canvas经常被修改标记为dirty，则会花费大量时间来刷新</li>
+<li>Tips:每当给定Canvas上的任何可绘制UI元素发生更改时，Canvas都必须重新运行批处理构建过程，这个过程会重新分析Canvas上每个待绘制的UI元素无论它是否被修改。（这里的修改包括了分配给sprite渲染器的sprite，位置和比例，文本网格中包含的文本等）</li>
+</ul>
+</li>
+<li><p>子对象规则</p>
+<ul>
+<li><p>UnituUI是根据对象在hierarchy中的排序从后到前构造，排序越前的对象会比靠后的对象先构造</p>
+</li>
+<li><p>通过从上到下遍历层级结构并收集使用相同材料与纹理的对象集合构建批次，但若出现了放置在两个可同批次处理对象之间的“中间层”，那么他们的合批就会被破坏</p>
+</li>
+<li><p>优化操作</p>
+<ul>
+<li>打开Frame Debug调整可绘制对象的顺序，以使可批处理对象们确保他们都被正常的合批处理未被意外的“中间层”打断，可将“中间层”调整至可合批的上方或者下方</li>
+<li>还可以通过调整对象的位置，直接消除不可见的重叠空间</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>分割画布</p>
+<ul>
+<li><p>除了特别琐碎的情况之外，拆分画布通常是一个好主意</p>
+</li>
+<li><p>同级画布通常最适合在某些UI部分必须始终与该UI其余部分分开控制深度以始终让它位于其他层之上或之下的情况使用</p>
+</li>
+<li><p>在大多数情况下，子画布更方便，因为其继承了父画布的一些显示设置</p>
+</li>
+<li><p>要设计出一个高性能的UI则需要在控制最小重建成本与控制最小化浪费的绘制调用之间取得平衡</p>
+</li>
+<li><p>一般情况</p>
+<ul>
+<li>Canvas会在其组成的可绘制组件中的任何一个发生更改的任何时候重新绘制，所以建议将任何不重要的Canvas分成至少两个部分，将那些需要同时更改的Canvas放置在同一个Canvas上。</li>
+<li>例如进度条与倒数计时器，放置在一个画布上，在另外一个画布上，放置所有静态且不变的元素，例如背景与标签。（主要还是确保动静分离避免无意义重绘，确保重绘主要是dirty标记元素）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Input"><a href="#Input" class="headerlink" title="Input"></a>Input</h3><ul>
+<li><p>Unity中的输入与射线计算</p>
+<ul>
+<li><p>GraphicRaycaster迭代所有将RaycastTarget设置为true的Graphic组件，对于每个RaycastTarget，都会执行一组测试，如果RaycastTarget通过了所有测试，则它被添加到匹配列表中。</p>
+</li>
+<li><p>检测步骤</p>
+<ul>
+<li>如果RaycastTarget勾选对象启用且被绘制</li>
+<li>如果输入点位于附加了RaycastTarget组件的对象的RectTransform中</li>
+<li>如果该对象或其父对象实现了ICanvasRaycastFilter并且该接口允许进行Raycast</li>
+</ul>
+</li>
+<li><p>结果</p>
+<ul>
+<li>命中的RaycastTargets列表根据深度进行排序，过滤掉背对的目标，过滤掉渲染在相机后面元素(即屏幕不可见)</li>
+<li>如果启用了2D或3D阻挡对象，则在射线阻挡物理层上2D或3D对象下方绘制的所有射线阻挡目标也将从命中列表中消除</li>
+<li>返回结果</li>
+</ul>
+</li>
+<li><p>优化技巧</p>
+<ul>
+<li>1.仅在必须接受指针时间的UI组件上启用RaycastTarget设置，尽可能缩小射线广播目标的列表长度，并且遍历的层次越浅，则每个射线广播测试会越快</li>
+<li>2.对于多个必须响应鼠标指针事件的可绘制UI对象的复合UI控件，最好将单个RaycastTarget放置在根节点控制，通过根节点转发指针事件到复合控件中对该消息感兴趣的组件中</li>
+</ul>
+</li>
+<li><p>场景层次深度和射线计算过滤器</p>
+<ul>
+<li>每一个GraphicRaycaster遍历hierarchy中所有transform去搜索raycastfilters，该搜索操作是随着场景中对象的深度呈线性增长，因为必须测试每个与Transform关联的所有组件，以查看他们是否实现了ICanvasRaycastFilter，所以这个操作也很耗时间。因为有几个使用了ICanvasRaycastFilter的标准UnityUI组件，例如CanvasGroup，Image，Mask和RectMask2D,因此不能轻易消除这种遍历</li>
+</ul>
+</li>
+<li><p>子画布和OverrideSorting属性</p>
+<ul>
+<li>子画布上的overrideSorting属性将会导致图形射线计算停止向上搜索transform，如果启用它不会带来层级排序和射线检测问题，那么这时候就应该使用它来降低射线计算在场景中的遍历搜索过滤器消耗</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="优化特定UI控件"><a href="#优化特定UI控件" class="headerlink" title="优化特定UI控件"></a>优化特定UI控件</h2><h3 id="重点介绍某些特定类型UI控件常见的问题"><a href="#重点介绍某些特定类型UI控件常见的问题" class="headerlink" title="重点介绍某些特定类型UI控件常见的问题"></a>重点介绍某些特定类型UI控件常见的问题</h3><h3 id="UIText"><a href="#UIText" class="headerlink" title="UIText"></a>UIText</h3><ul>
+<li><p>文本字形实际上是以单个四边形呈现的，每个字符一个，根据字体的形状，这些四边形往往会在字形周围具有大量空白空间，这很容易在无意中破坏了其他UI元素的批处理</p>
+</li>
+<li><p>问题</p>
+<ul>
+<li><p>文字网格频繁重建问题</p>
+<ul>
+<li>主要的问题体现在UI文本网格的重建过程，每当更改UIText组件时，该文本组件都必须重新计算用于显示实际文本的多边形，就算仅禁用与启用其文本组件或其任何父GameObject没有更改，也会重新计算</li>
+<li>在显示大量文本的用户界面时，这种行为都是有问题的，因此针对于复杂文本显示的场景用来控制其隐藏与显示的方法不能是启用或禁用包含该UI的GameObject</li>
+</ul>
+</li>
+<li><p>显示字符集很大或运行之前未知</p>
+</li>
+<li><p>存在公用字形情况</p>
+</li>
+</ul>
+</li>
+<li><p>解决方法</p>
+<ul>
+<li><p>文字网格频繁重建问题</p>
+<ul>
+<li>通过禁用CanvasSession来控制显示与否</li>
+</ul>
+</li>
+<li><p>显示字符集很大或运行之前未知</p>
+<ul>
+<li>动态字体和字体图集</li>
+</ul>
+</li>
+<li><p>存在公用字形情况</p>
+<ul>
+<li>编写自定义组件以显示这些字形的子画面会比Canvas驱动的UIText组件更快的计算创建动画与显示</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>*BestFit选项</p>
+<ul>
+<li>通常情况下，最好不要使用UIText组件的BestFit选项因为其性能开销过大</li>
+</ul>
+</li>
+</ul>
+<h3 id="TextMeshPro"><a href="#TextMeshPro" class="headerlink" title="TextMeshPro"></a>TextMeshPro</h3><ul>
+<li>TextMeshPro使用符号距离字段作为其主要的文本渲染管道，从而可以在任何大小和分辨率下清晰地渲染文本，现在已经替代了Unity现有的文本组件</li>
+<li>文字网格重建</li>
+<li>字体和内存使用情况</li>
+</ul>
+<h3 id="ScrollView"><a href="#ScrollView" class="headerlink" title="ScrollView"></a>ScrollView</h3><ul>
+<li><p>滚动视图的性能问题是在填充率问题之后的第二大常见运行时性能问题</p>
+</li>
+<li><p>问题常出现在填充滚动视图</p>
+<ul>
+<li><p>用代表所有滚动视图内容的所有必要元素填充它</p>
+<ul>
+<li>随着要表示的项目数增加而需要更多的时间来实例化所有UI元素</li>
+</ul>
+</li>
+<li><p>合并元素，根据需要重新定位它们以表示可见内容</p>
+<ul>
+<li>需要大量代码才能在当前的UI和布局系统下正确实现</li>
+</ul>
+</li>
+<li><p>对于任何非常复杂的滚动UI，通常都需要某种池化的方法来避免性能问题</p>
+</li>
+<li><p>这里所有的表现问题都能通过添加一个RectMask2D来改进</p>
+<ul>
+<li>该组件确保在滚动画布的视口外的滚动视图元素不包含在可绘制元素的列表中。而这些元素在重建Canvas时必须生成，排序和分析其几何形状会带来性能消耗</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>常用解决方法</p>
+<ul>
+<li><p>使用带有LayoutElement组件的GameObject作为可见UI元素的“占位符”</p>
+</li>
+<li><p>实例化UI元素池，该池所包含元素足够填充ScrollView的可见区域，在滚动视图时，重复使用UI元素以显示滚动到视图中的内容</p>
+</li>
+<li><p>这大大减少了UI合批的次数，因为合批的花销仅仅跟Canvas中CanvasRenderers数量有关而非其RectTransforms的数量有关</p>
+</li>
+<li><p>带来的问题：每当重设UI元素或更改其兄弟元素顺序时，该元素及其所有子元素都将标记为dirty，并强制对其Canvas进行重建</p>
+<ul>
+<li>Unity并未分离用于重构transform与更改其同级兄弟顺序的回调，他们都会触发OnTransformParentChanged回调，在Graphic类的源代码中，该回调实现并调用方法SetAllDirty</li>
+<li>解决方法：将画布分配给ScrollView中每个元素的根RectTransform，这将把重建限制在仅父元素而不是ScrollView的全部内容中，但是这样又会增加渲染这个滚动视图所需要的绘制调用次数</li>
+<li>第二个解决方法：如果ScrollViewUI元素的大小不可变，则不需要对布局和顶点进行完全重新计算，那么我们就需要实现一个基于其元素位置更改而不是父级或同级顺序更改的对象池解决方案</li>
+</ul>
+</li>
+<li><p>基于位置的滚动视图池</p>
+<ul>
+<li>通过创建一个简单地移动其包含的UI元素的RectTransform的对象池来避免在没有修改尺寸的情况下重建RectTransforms内容，从而提高了ScrollView的性能</li>
+<li>可以通过编写一个ScrollView的自定义子类或编写一个自定义的LayoutGroup组件，后者通常更为简单，可以通过实现UnityUI的LayoutGroup抽象基类的子类来实现</li>
+<li>自定义LayoutGroup可以分析基础源数据来检查必须显示多少个数据元素。可以适当调整ScrollView的ContentRectTransform的大小，然后通过订阅ScrollView更改时间，并使用这些时间相应地重新定位其可见元素</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="其他UI优化技术与技巧"><a href="#其他UI优化技术与技巧" class="headerlink" title="其他UI优化技术与技巧"></a>其他UI优化技术与技巧</h2><h3 id="这里有一些优化技巧可能会在结构上显得“不干净”，可能变得难以维护，可能是在UI中的一些简化初始开发的行为"><a href="#这里有一些优化技巧可能会在结构上显得“不干净”，可能变得难以维护，可能是在UI中的一些简化初始开发的行为" class="headerlink" title="这里有一些优化技巧可能会在结构上显得“不干净”，可能变得难以维护，可能是在UI中的一些简化初始开发的行为"></a>这里有一些优化技巧可能会在结构上显得“不干净”，可能变得难以维护，可能是在UI中的一些简化初始开发的行为</h3><h3 id="基于RectTransform的布局"><a href="#基于RectTransform的布局" class="headerlink" title="基于RectTransform的布局"></a>基于RectTransform的布局</h3><ul>
+<li><p>布局组件消耗相对较大，因为布局组件每次标记为dirty时必须重新计算其子元素的大小和位置，如果给定布局中元素的数量相对较小且固定，并且布局具有相对简单的结构，则可以通过基于RectTransfrom锚点布局进行替换</p>
+</li>
+<li><p>例如，可以使用两个RectTransforms实现简单的两列布局</p>
+<ul>
+<li>左列的锚点应为：X:(0,0.5)和Y(0,1)</li>
+<li>右列的锚点应为：X:(0.5,1)和Y(0,1)</li>
+</ul>
+</li>
+<li><p>RectTransform的大小和位置的计算将由Transform系统原生代码进行计算，通常这比依赖Layout系统的性能更高，也可以编写MonoBehaviours来设置基于RectTransform的布局，但这相对复杂</p>
+</li>
+</ul>
+<h3 id="禁用画布"><a href="#禁用画布" class="headerlink" title="禁用画布"></a>禁用画布</h3><ul>
+<li>一般当需要显示或隐藏UI的零散部分时，我们会在UI的根部启用或禁用GameObject，这样可以确保禁用的UI中的任何组件都不会接受输入或Unity回调</li>
+<li>但是这也导致了Canvas放弃其VBO数据，重新启用对象画布时需要运行重建和重新批处理过程，这种情况如果经常发生，则会导致CPU使用率增加进而导致帧率降低</li>
+<li>*考虑将要显示/隐藏的UI放置在其自己的Canvas或Sub-Canvas上，然后尽在此对象上启用/禁用Canvas组件</li>
+<li>这回导致不绘制UI的网格，但是他们将保持驻留在内存中，并且将保留其原始批处理，此外将不会再UI的层次结构中调用OnEnable或OnDisable回调</li>
+<li>*但是，这不会禁用隐藏UI中的任何MonoBehaviors，因此这些MonoBehaviours仍将接受Unity的生命周期回调，例如Update</li>
+<li>因此，为了避免这个问题，采用这种方式禁用UI上的MonoBehaviours不应直接实现Unity的生命周期回调，而应该从UI根GameObject上的“回调管理器”Mono Behaviour接受其回调，每当显示/隐藏UI时，通知此回调管理器，可以确保根据需要传播或不传播生命周期事件，有关回调管理器的模式，请自行认真考虑</li>
+</ul>
+<h3 id="分配事件摄像机"><a href="#分配事件摄像机" class="headerlink" title="分配事件摄像机"></a>分配事件摄像机</h3><ul>
+<li>如果使用Unity的内置输入管理器并且Canvases设置渲染WorldSpace或者ScreenSpace-Camera模式，那么请一定要分别设置事件摄像机或渲染摄像机属性，在脚本中都称之为worldCamera属性</li>
+<li>如果不设置的话，那么每打开一个WorldSpace或者CameraSpace的Canvas都会默认通过maincamera标签搜索附加了camera组件的游戏对象</li>
+<li>因此，强烈建议在所有WorldSpace和CameraSpace的Canvas初始化时分配其Camera属性</li>
+<li>Overlay模式的Canvases不会发生此问题</li>
+</ul>
+<h3 id="UI源代码定制"><a href="#UI源代码定制" class="headerlink" title="*UI源代码定制"></a>*UI源代码定制</h3><ul>
+<li>略</li>
+</ul>
+<h2 id="实际操作（项目中实际进行的一些操作，持续补充更新中…）"><a href="#实际操作（项目中实际进行的一些操作，持续补充更新中…）" class="headerlink" title="实际操作（项目中实际进行的一些操作，持续补充更新中…）"></a>实际操作（项目中实际进行的一些操作，持续补充更新中…）</h2><h3 id="UIText的字体文件引用同一个"><a href="#UIText的字体文件引用同一个" class="headerlink" title="UIText的字体文件引用同一个"></a>UIText的字体文件引用同一个</h3><h3 id="图片应用同一图集"><a href="#图片应用同一图集" class="headerlink" title="图片应用同一图集"></a>图片应用同一图集</h3><h3 id="注意相对层级结构"><a href="#注意相对层级结构" class="headerlink" title="注意相对层级结构"></a>注意相对层级结构</h3><h3 id="当启用了Mask组件结合自动布局组件使用时，注意mask边界情况Batches的处理，根据需要调优"><a href="#当启用了Mask组件结合自动布局组件使用时，注意mask边界情况Batches的处理，根据需要调优" class="headerlink" title="当启用了Mask组件结合自动布局组件使用时，注意mask边界情况Batches的处理，根据需要调优"></a>当启用了Mask组件结合自动布局组件使用时，注意mask边界情况Batches的处理，根据需要调优</h3><h3 id="ScrollView中使用RectMask2D替换Mask"><a href="#ScrollView中使用RectMask2D替换Mask" class="headerlink" title="ScrollView中使用RectMask2D替换Mask"></a>ScrollView中使用RectMask2D替换Mask</h3></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:894712026@qq.com">Keal</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://gamerblog.cn/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/">http://gamerblog.cn/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://gamerblog.cn" target="_blank">GamerBlog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/UGUI/">UGUI</a><a class="post-meta__tags" href="/tags/UI/">UI</a><a class="post-meta__tags" href="/tags/UNITY/">UNITY</a></div><div class="post_share"><div class="social-share" data-image="/img/post/UnityLogo.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/02/17/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A/"><img class="next-cover" data-lazy-src="/img/post/s1113106.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">计算机程序的构造和解释</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="/img/avatar.JPG" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Keal</div><div class="author-info__description">啊被你发现了！这里是总结、温习与分享的小窝！</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/KealG"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://www.zhihu.com/people/dcoding-42" target="_blank" title="知乎"><i class="iconfont icon-zhihu"></i></a><a class="social-icon" href="https://leetcode-cn.com/u/qimingd/" target="_blank" title="Leetcode"><i class="iconfont icon-leetcode"></i></a><a class="social-icon" href="mailto:goo.kgdong@gmail.com" target="_blank" title="Email"><i class="iconfont icon-youjian"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97"><span class="toc-text">优化UnityUI指南</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-text">常见问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E5%88%A9%E7%94%A8%E7%8E%87%E8%BF%87%E9%AB%98"><span class="toc-text">CPU片段着色器利用率过高</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8A%B1%E8%B4%B9%E5%A4%A7%E9%87%8FCPU%E6%97%B6%E9%97%B4%E9%87%8D%E5%BB%BACanvas%E6%89%B9%E5%A4%84%E7%90%86"><span class="toc-text">花费大量CPU时间重建Canvas批处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%BB%E5%B8%83%E6%89%B9%E5%A4%84%E7%90%86%E7%9A%84%E9%87%8D%E5%BB%BA%E6%95%B0%E9%87%8F%E8%BF%87%E5%A4%9A"><span class="toc-text">画布批处理的重建数量过多</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8A%B1%E8%B4%B9%E8%BF%87%E5%A4%9A%E7%9A%84CPU%E6%97%B6%E9%97%B4%E6%9D%A5%E7%94%9F%E6%88%90%E9%A1%B6%E7%82%B9"><span class="toc-text">花费过多的CPU时间来生成顶点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UGUI%E6%80%A7%E8%83%BD%E5%8F%97%E5%88%B0%E5%8F%91%E9%80%81%E5%88%B0GPU%E7%9A%84%E5%A4%A7%E9%87%8F%E7%BB%98%E5%9B%BE%E8%B0%83%E7%94%A8%E7%9A%84%E9%99%90%E5%88%B6%EF%BC%8C%E4%BD%86%E6%98%AF%E4%BB%BB%E4%BD%95%E9%80%9A%E8%BF%87%E7%BB%98%E5%9B%BE%E8%B0%83%E7%94%A8%E4%BD%BFGPU%E8%BF%87%E8%BD%BD%E7%9A%84%E9%A1%B9%E7%9B%AE%E9%83%BD%E6%9B%B4%E6%9C%89%E5%8F%AF%E8%83%BD%E6%94%B6%E5%88%B0%E5%A1%AB%E5%85%85%E7%8E%87%E8%BF%87%E5%BA%A6%E4%BD%BF%E7%94%A8%E7%9A%84%E7%BA%A6%E6%9D%9F"><span class="toc-text">UGUI性能受到发送到GPU的大量绘图调用的限制，但是任何通过绘图调用使GPU过载的项目都更有可能收到填充率过度使用的约束</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UI%E5%9F%BA%E7%A1%80%E6%9C%AF%E8%AF%AD%E5%8F%8A%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="toc-text">UI基础术语及相关概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#canvas"><span class="toc-text">canvas</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sub-canvas"><span class="toc-text">sub-canvas</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Graphic%E5%9F%BA%E7%B1%BB"><span class="toc-text">Graphic基类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Layout%E7%BB%84%E4%BB%B6"><span class="toc-text">Layout组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CanvasUpdateRegistry%E7%B1%BB"><span class="toc-text">CanvasUpdateRegistry类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B2%E6%9F%93%E7%BB%86%E8%8A%82"><span class="toc-text">渲染细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Canvas%E7%9A%84Batch%E8%BF%87%E7%A8%8B"><span class="toc-text">Canvas的Batch过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Graphics%E7%9A%84%E9%87%8D%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="toc-text">Graphics的重建过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UnityUIProfilingTools"><span class="toc-text">UnityUIProfilingTools</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AF%AB%E7%A7%92-%E6%96%B9%E6%B3%95%E7%BA%A7%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%A4%96%E9%83%A8%E6%89%A9%E5%B1%95%E5%B7%A5%E5%85%B7"><span class="toc-text">毫秒-方法级性能分析外部扩展工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnityProfiler"><span class="toc-text">UnityProfiler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnityFrameDebugger"><span class="toc-text">UnityFrameDebugger</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE"><span class="toc-text">一些建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Instruments%E5%92%8CVTune%E5%AF%B9Apple%E5%92%8CIntelCPU%E4%B8%8A%E7%9A%84UnityUI%E9%87%8D%E5%BB%BA%E5%92%8CCanvas%E6%89%B9%E5%A4%84%E7%90%86%E8%BF%9B%E8%A1%8C%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90"><span class="toc-text">Instruments和VTune对Apple和IntelCPU上的UnityUI重建和Canvas批处理进行深入分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E5%B9%BF%E6%B3%9B%E7%9A%84UnityUI%E9%97%AE%E9%A2%98Fill-rate-Canvas%E5%92%8Cinput"><span class="toc-text">更广泛的UnityUI问题Fill-rate,Canvas和input</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E5%A1%AB%E5%85%85%E7%8E%87%E9%97%AE%E9%A2%98"><span class="toc-text">修复填充率问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UICanvas%E9%87%8D%E5%BB%BA%EF%BC%88Rebuild%EF%BC%89"><span class="toc-text">UICanvas重建（Rebuild）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Input"><span class="toc-text">Input</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E7%89%B9%E5%AE%9AUI%E6%8E%A7%E4%BB%B6"><span class="toc-text">优化特定UI控件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E7%82%B9%E4%BB%8B%E7%BB%8D%E6%9F%90%E4%BA%9B%E7%89%B9%E5%AE%9A%E7%B1%BB%E5%9E%8BUI%E6%8E%A7%E4%BB%B6%E5%B8%B8%E8%A7%81%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">重点介绍某些特定类型UI控件常见的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UIText"><span class="toc-text">UIText</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TextMeshPro"><span class="toc-text">TextMeshPro</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ScrollView"><span class="toc-text">ScrollView</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96UI%E4%BC%98%E5%8C%96%E6%8A%80%E6%9C%AF%E4%B8%8E%E6%8A%80%E5%B7%A7"><span class="toc-text">其他UI优化技术与技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E6%9C%89%E4%B8%80%E4%BA%9B%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7%E5%8F%AF%E8%83%BD%E4%BC%9A%E5%9C%A8%E7%BB%93%E6%9E%84%E4%B8%8A%E6%98%BE%E5%BE%97%E2%80%9C%E4%B8%8D%E5%B9%B2%E5%87%80%E2%80%9D%EF%BC%8C%E5%8F%AF%E8%83%BD%E5%8F%98%E5%BE%97%E9%9A%BE%E4%BB%A5%E7%BB%B4%E6%8A%A4%EF%BC%8C%E5%8F%AF%E8%83%BD%E6%98%AF%E5%9C%A8UI%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8C%96%E5%88%9D%E5%A7%8B%E5%BC%80%E5%8F%91%E7%9A%84%E8%A1%8C%E4%B8%BA"><span class="toc-text">这里有一些优化技巧可能会在结构上显得“不干净”，可能变得难以维护，可能是在UI中的一些简化初始开发的行为</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8ERectTransform%E7%9A%84%E5%B8%83%E5%B1%80"><span class="toc-text">基于RectTransform的布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A6%81%E7%94%A8%E7%94%BB%E5%B8%83"><span class="toc-text">禁用画布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E9%85%8D%E4%BA%8B%E4%BB%B6%E6%91%84%E5%83%8F%E6%9C%BA"><span class="toc-text">分配事件摄像机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UI%E6%BA%90%E4%BB%A3%E7%A0%81%E5%AE%9A%E5%88%B6"><span class="toc-text">*UI源代码定制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E6%93%8D%E4%BD%9C%EF%BC%88%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%AE%9E%E9%99%85%E8%BF%9B%E8%A1%8C%E7%9A%84%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C%EF%BC%8C%E6%8C%81%E7%BB%AD%E8%A1%A5%E5%85%85%E6%9B%B4%E6%96%B0%E4%B8%AD%E2%80%A6%EF%BC%89"><span class="toc-text">实际操作（项目中实际进行的一些操作，持续补充更新中…）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UIText%E7%9A%84%E5%AD%97%E4%BD%93%E6%96%87%E4%BB%B6%E5%BC%95%E7%94%A8%E5%90%8C%E4%B8%80%E4%B8%AA"><span class="toc-text">UIText的字体文件引用同一个</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E5%BA%94%E7%94%A8%E5%90%8C%E4%B8%80%E5%9B%BE%E9%9B%86"><span class="toc-text">图片应用同一图集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E7%9B%B8%E5%AF%B9%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84"><span class="toc-text">注意相对层级结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%93%E5%90%AF%E7%94%A8%E4%BA%86Mask%E7%BB%84%E4%BB%B6%E7%BB%93%E5%90%88%E8%87%AA%E5%8A%A8%E5%B8%83%E5%B1%80%E7%BB%84%E4%BB%B6%E4%BD%BF%E7%94%A8%E6%97%B6%EF%BC%8C%E6%B3%A8%E6%84%8Fmask%E8%BE%B9%E7%95%8C%E6%83%85%E5%86%B5Batches%E7%9A%84%E5%A4%84%E7%90%86%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%9C%80%E8%A6%81%E8%B0%83%E4%BC%98"><span class="toc-text">当启用了Mask组件结合自动布局组件使用时，注意mask边界情况Batches的处理，根据需要调优</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ScrollView%E4%B8%AD%E4%BD%BF%E7%94%A8RectMask2D%E6%9B%BF%E6%8D%A2Mask"><span class="toc-text">ScrollView中使用RectMask2D替换Mask</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/" title="优化UnityUI指南——官方文档翻译与总结"><img data-lazy-src="/img/post/UnityLogo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="优化UnityUI指南——官方文档翻译与总结"/></a><div class="content"><a class="title" href="/2021/02/17/%E4%BC%98%E5%8C%96UnityUI%E6%8C%87%E5%8D%97%E2%80%94%E2%80%94%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%80%BB%E7%BB%93/" title="优化UnityUI指南——官方文档翻译与总结">优化UnityUI指南——官方文档翻译与总结</a><time datetime="2021-02-17T12:02:23.000Z" title="发表于 2021-02-17 20:02:23">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A/" title="计算机程序的构造和解释"><img data-lazy-src="/img/post/s1113106.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="计算机程序的构造和解释"/></a><div class="content"><a class="title" href="/2021/02/17/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A/" title="计算机程序的构造和解释">计算机程序的构造和解释</a><time datetime="2021-02-17T11:00:34.000Z" title="发表于 2021-02-17 19:00:34">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E5%B7%A5%E7%A8%8B%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97/" title="工程快速上手指南"><img data-lazy-src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="工程快速上手指南"/></a><div class="content"><a class="title" href="/2021/02/17/%E5%B7%A5%E7%A8%8B%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97/" title="工程快速上手指南">工程快速上手指南</a><time datetime="2021-02-17T11:00:18.000Z" title="发表于 2021-02-17 19:00:18">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/" title="Shader入门精要"><img data-lazy-src="/img/post/ShaderRumen.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Shader入门精要"/></a><div class="content"><a class="title" href="/2021/02/17/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/" title="Shader入门精要">Shader入门精要</a><time datetime="2021-02-17T11:00:04.000Z" title="发表于 2021-02-17 19:00:04">2021-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/" title="操作系统导论"><img data-lazy-src="/img/post/s32332106.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="操作系统导论"/></a><div class="content"><a class="title" href="/2021/02/17/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/" title="操作系统导论">操作系统导论</a><time datetime="2021-02-17T06:51:11.000Z" title="发表于 2021-02-17 14:51:11">2021-02-17</time></div></div></div></div></div></div></main><footer id="footer" style="background: /img/post/UnityLogo.jpg"><div id="footer-wrap"><div class="copyright">&copy;2021 By Keal</div><div class="footer_custom_text">要比昨天的自己更厉害才是啊！</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font-plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font-minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
